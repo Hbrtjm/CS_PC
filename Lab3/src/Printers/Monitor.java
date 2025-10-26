@@ -3,44 +3,46 @@ package Printers;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 
 public class Monitor {
-    Set<Printer> printersSet = new HashSet<>();
-    Lock lock = new ReentrantLock();
+    private Set<Printer> availablePrinters = new HashSet<>();
+    private Lock lock = new ReentrantLock();
+    private Condition printerAvailable = lock.newCondition();
 
     public Monitor(int M) {
-        for(int i = 0;i < M;i++) {
-            printersSet.add(new Printer(i));
+        for(int i = 0; i < M; i++) {
+            availablePrinters.add(new Printer(i));
         }
     }
 
-    synchronized public Printer reserve() {
-        if (lock.tryLock()) {
-            lock.lock();
-            Printer reservedPrinter = new Printer(-1);
-            Iterator<Printer> iterator = printersSet.iterator();
-            try {
-                while (!iterator.hasNext()) {
-                    lock.wait();
-                }
-                reservedPrinter = iterator.next();
-                printersSet.remove(reservedPrinter);
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted" + e.getMessage());
-            } finally {
-                lock.unlock();
-            }
-            return reservedPrinter;
-        }
-    }
-
-    synchronized public void release(Printer reservedPrinter) {
+    public Printer reserve() {
         lock.lock();
         try {
-            printersSet.add(reservedPrinter);
-            lock.notifyAll();
+            while (availablePrinters.isEmpty()) {
+                printerAvailable.await();
+            }
+            Iterator<Printer> iterator = availablePrinters.iterator();
+            Printer reservedPrinter = iterator.next();
+            availablePrinters.remove(reservedPrinter);
+            System.out.println("Thread " + Thread.currentThread().getName() + " reserved printer " + reservedPrinter.id);
+            return reservedPrinter;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Thread interrupted while waiting for printer: " + e.getMessage());
+            return null;
+        } finally {
+            lock.unlock();
         }
-        finally {
+    }
+
+    public void release(Printer printer) {
+        lock.lock();
+        try {
+            availablePrinters.add(printer);
+            System.out.println("Thread " + Thread.currentThread().getName() + " released printer " + printer.id);
+            printerAvailable.signal();
+        } finally {
             lock.unlock();
         }
     }
