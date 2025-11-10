@@ -3,11 +3,13 @@ package Restaurant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ClientPair extends Thread {
-    private Waiter waiter;
-    private int pairId;
+    private final Waiter waiter;
+    private final int pairId;
+    private final int personId;
 
     public ClientPair(int pairId, int personId, Waiter waiter) {
         this.pairId = pairId;
+        this.personId = personId;
         this.waiter = waiter;
         this.setName("Pair-" + pairId + "-Person-" + personId);
     }
@@ -17,10 +19,10 @@ public class ClientPair extends Thread {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 waking();
-                waiter.wantTable(pairId);
+                waiter.wantTable(pairId, personId);
                 eat();
-                waiter.freeUp();
-                
+                waiter.freeUp(personId);
+
             } catch (Exception e) {
                 System.out.println("Exception in " + Thread.currentThread().getName() + ": " + e.getMessage());
                 break;
