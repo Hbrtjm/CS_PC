@@ -56,3 +56,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+
+*.csv
