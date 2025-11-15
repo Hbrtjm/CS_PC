@@ -36,25 +36,14 @@ public class Simulation {
             int y1 = 0;
             while (y1 < height) {
                 int y2 = Math.min(y1 + step - 1, height - 1);
-
-                MandelbrotCalculator worker =
-                        new MandelbrotCalculator(
-                                new Int4(0, y1, width - 1, y2),
-                                zoom, maxIter, image, width, height, true
-                        );
-
+                MandelbrotCalculator worker = new MandelbrotCalculator(new Int4(0, y1, width - 1, y2),zoom, maxIter, image, width, height, render);
                 futures.add(threadPool.submit(worker));
                 y1 += step;
             }
-
         } else {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    MandelbrotCalculator worker =
-                            new MandelbrotCalculator(
-                                    new Int4(x, y, x, y),
-                                    zoom, maxIter, image, width, height, true
-                            );
+                    MandelbrotCalculator worker = new MandelbrotCalculator(new Int4(x, y, x, y),zoom, maxIter, image, width, height, render);
                     futures.add(threadPool.submit(worker));
                 }
             }
