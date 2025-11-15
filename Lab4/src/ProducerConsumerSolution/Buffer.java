@@ -41,7 +41,7 @@ public class Buffer {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            if (waitedAtGate) consumerGateCond.signal();
+            consumerGateCond.signal();
             lock.unlock();
         }
     }
@@ -64,7 +64,7 @@ public class Buffer {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            if (waitedAtGate) producerGateCond.signal();
+            producerGateCond.signal();
             lock.unlock();
         }
     }

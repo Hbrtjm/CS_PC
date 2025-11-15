@@ -41,12 +41,39 @@ def plot_run(run: int, entities=("producers", "consumers"), names={"producers": 
             plt.plot(gb["amount"], gb["time"], "o--",
                      label=f"{names.get(entity, entity)} — Rozwiązanie naiwne")
             plotted_any = True
+            if logy:
+                ylabel = "Średni czas oczekiwania [ns] (skala log)"
+            else:
+                ylabel = "Średni czas oczekiwania [ns]"
+
+            plt.title(f"Średni czas względem wielkości porcji naiwny — Symulacja nr. {run}")
+            plt.xlabel("Amount")
+            plt.ylabel(ylabel)
+            if plotted_any:
+                plt.legend()
+            plt.grid(True, which="both", axis="both")
+            plt.tight_layout()
+            plt.show()
 
         if sol is not None:
             gs = mean_by_amount(sol)
             plt.plot(gs["amount"], gs["time"], "o-",
                      label=f"{names.get(entity, entity)} — Priorytetyzacja")
             plotted_any = True
+            if logy:
+                ylabel = "Średni czas oczekiwania [ns] (skala log)"
+            else:
+                ylabel = "Średni czas oczekiwania [ns]"
+
+            plt.title(f"Średni czas względem wielkości porcji rozwiązany    — Symulacja nr. {run}")
+            plt.xlabel("Amount")
+            plt.ylabel(ylabel)
+            if plotted_any:
+                plt.legend()
+            plt.grid(True, which="both", axis="both")
+            plt.tight_layout()
+
+            plt.show()
 
     if logy:
         ylabel = "Średni czas oczekiwania [ns] (skala log)"

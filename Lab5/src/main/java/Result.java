@@ -1,0 +1,1 @@
+public record Result(int maxIter, int threads, int pixelsPerThread, double meanMs, double stdMs) {}

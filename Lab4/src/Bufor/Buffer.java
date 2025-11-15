@@ -73,8 +73,10 @@ public class Buffer {
         try {
             slots[idx] = level;
             busy[idx] = false;
-            if (level == finalLevel) condDone.signal();
-            else                      condStage[level].signal();
+            if (level == finalLevel)
+                condDone.signal();
+            else
+                condStage[level].signal();
             idx = (idx + 1) % size;
             System.out.print(" -> Processed ->");
             this.printState();
